@@ -1,0 +1,2 @@
+json_key_file("/Users/etio/Projects/where_did_my_money_go/api-7211411475961309372-595004-c2dfb1799f47.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("ca.example.where_did_my_money_go")

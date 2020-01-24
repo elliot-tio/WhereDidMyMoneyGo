@@ -1,4 +1,4 @@
-package com.example.where_did_my_money_go
+package ca.elliottio.where_did_my_money_go
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.android.FlutterActivity
