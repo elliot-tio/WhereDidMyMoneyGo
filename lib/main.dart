@@ -17,7 +17,7 @@ class WhereDidMyMoneyGo extends StatelessWidget {
         accentColor: Colors.cyan[200],
         fontFamily: 'Roboto',
         textTheme: TextTheme(
-          title: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold,)
+          headline6: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold,)
         ),
       ),
       home: Home(),

@@ -1,30 +1,9 @@
 import 'package:flutter_masked_text/flutter_masked_text.dart';
 import 'package:intl/intl.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
-
-class Expense {
-  final int id;
-  final String description;
-  final String location;
-  final String category;
-  final double amount;
-  final int dateTime;
-
-  Expense({this.id, this.description, this.location, this.category, this.amount, this.dateTime});
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'description': description,
-      'location': location,
-      'category': category,
-      'amount': amount,
-      'dateTime': dateTime,
-    };
-  }
-}
+import 'expense.dart';
+import 'helpers.dart';
 
 class AddExpenseForm extends StatefulWidget {
   AddExpenseForm({Key key}) : super(key: key);
@@ -43,6 +22,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
 
   FocusNode focusOnError;
 
+
   @override
   void initState() {
     super.initState();
@@ -50,23 +30,9 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
     focusOnError = FocusNode();
   }
 
-  getDatabase() async {
-    final Future<Database> database = openDatabase(
-      join(await getDatabasesPath(), 'where_did_my_money_go.db'),
-
-      onCreate: (db, version) {
-        return db.execute(
-          "CREATE TABLE expenses(id INTEGER PRIMARY KEY AUTOINCREMENT, description TEXT, location TEXT, category TEXT, amount REAL, datetime INTEGER)"
-        );
-      },
-      version: 1
-    );
-    return database;
-  }
-
   Future<void> insertExpense(Expense expense) async {
     // Get a reference to the database.
-    final Database db = await getDatabase();
+    final Database db = await Helpers.getDatabase();
 
     await db.insert(
       'expenses',
@@ -137,7 +103,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
             children: <Widget>[
               Text('Categories'),
               DropdownButton(
-                items: <String>['Bills', 'Entertainment', 'Food', 'Gas', 'Other'].map((String value) {
+                items: <String>['Bills', 'Debt', 'Entertainment', 'Food', 'Gas', 'Other'].map((String value) {
                   return new DropdownMenuItem<String>(
                     value: value,
                     child: new Text(value),
@@ -208,6 +174,8 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
                         amount: moneyController.numberValue,
                         dateTime: _dateTime.millisecondsSinceEpoch,
                       ));
+                      Scaffold.of(context).showSnackBar(SnackBar(content: Text('Success! Expense Saved!'), backgroundColor: Colors.lightGreen[300],));
+                      _formKey.currentState.reset();
                     } else {
                       FocusScope.of(context).requestFocus(focusOnError);
                     }
