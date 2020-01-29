@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'add_expense_form.dart';
 import 'overview.dart';
+import 'summary.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -11,16 +12,14 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   int _selectedIndex = 0;
-  static const TextStyle optionStyle =
-      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   static List<Widget> _widgetOptions = <Widget>[
     Container(
       padding: const EdgeInsets.all(16),
       child: Overview(),
     ),
-    Text(
-      'Summary',
-      style: optionStyle,
+    Container(
+      padding: const EdgeInsets.all(16),
+      child: Summary(),
     ),
     Container(
       padding: const EdgeInsets.all(32),

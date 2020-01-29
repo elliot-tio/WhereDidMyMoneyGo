@@ -1,26 +1,99 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'expense.dart';
 import 'helpers.dart';
 
-class Overview extends StatelessWidget {
+class Overview extends StatefulWidget {
+  @override
+  _OverviewState createState() => _OverviewState();
+}
+
+class _OverviewState extends State<Overview> {
+  var _children = <Widget>[
+    SizedBox(
+      child: CircularProgressIndicator(),
+      width: 60,
+      height: 60,
+    ),
+    const Padding(
+      padding: EdgeInsets.only(top: 16),
+      child: Text('Loading...'),
+    )
+  ];
+  var _childrenTotal = <Widget>[
+    SizedBox(
+      child: CircularProgressIndicator(),
+      width: 60,
+      height: 60,
+    ),
+    const Padding(
+      padding: EdgeInsets.only(top: 16),
+      child: Text('Loading...'),
+    )
+  ];
+  Timer _timer;
+
+  @override
+  void initState() {
+    _timer = Timer(new Duration(seconds: 1), () {
+      setState(() {
+        _children = <Widget>[
+          new Text(
+            "No expenses yet!", 
+            style: TextStyle(
+              fontSize: 25, 
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.primaryVariant
+            ),
+          ),
+        ];
+        _childrenTotal = <Widget>[
+          new Text(
+            "\$0", 
+            style: TextStyle(
+              fontSize: 25, 
+              fontWeight: FontWeight.bold,
+              color: Colors.black
+            ),
+          ),
+        ];
+      });
+    });
+    super.initState();
+  }
+
   Future<List<Expense>> expenses() async {
-    // Get a reference to the database.
     final Database db = await Helpers.getDatabase();
 
-    // Query the table for all The Dogs.
-    final List<Map<String, dynamic>> maps = await db.query('expenses');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'expenses', 
+      columns: [
+        "SUM(amount) AS sum",
+        "category",
+        "dateTime",
+      ], 
+      groupBy: "category");
 
-    // Convert the List<Map<String, dynamic> into a List<Dog>.
     return List.generate(maps.length, (i) {
       return Expense(
-        id: maps[i]['id'],
-        description: maps[i]['description'],
-        location: maps[i]['location'],
         category: maps[i]['category'],
-        amount: maps[i]['amount'],
-        dateTime: maps[i]['dateTime']
+        amount: maps[i]['sum'],
+        dateTime: maps[i]['datetime']
       );
+    });
+  }
+
+  Future<List<double>> totalExpenses() async {
+    final Database db = await Helpers.getDatabase();
+
+    final List<Map<String, dynamic>> total = await db.query(
+      'expenses',
+      columns: ["SUM(amount) AS total"],
+    );
+
+    return List.generate(total.length, (i) {
+      return total[i]['total'];
     });
   }
 
@@ -28,8 +101,16 @@ class Overview extends StatelessWidget {
     return await expenses();
   }
 
-  final sum = 10000;
-  final List<int> categoriesSum = <int>[100, 200, 300, 400, 500, 600, 700, 100, 200, 300, 400, 500, 600, 700, 100, 200, 300, 400, 500, 600, 700];
+  Future<List<double>> getTotalExpenses() async {
+    return await totalExpenses();
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    _timer = null;
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,14 +154,29 @@ class Overview extends StatelessWidget {
                   ),
                 ),
                 Container(height: 15),
-                Text(
-                  '\$$sum',
-                  style: TextStyle(
-                    fontSize: 25, 
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black
-                  ),
-                ),
+                new FutureBuilder(
+                  future: getTotalExpenses(),
+                  builder: (BuildContext context, AsyncSnapshot<List<double>> snapshot) {
+                    if (snapshot.data == null || snapshot.data.isEmpty || !snapshot.hasData) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: _childrenTotal
+                        )
+                      );
+                    }
+                    var total = snapshot.data[0] != null ? snapshot.data[0].toStringAsFixed(2) : 0;
+                    return new Text(
+                      '\$$total',
+                      style: TextStyle(
+                        fontSize: 25, 
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black
+                      ),
+                    );
+                  },
+                )
               ],
             ),
             Divider(
@@ -92,32 +188,35 @@ class Overview extends StatelessWidget {
               child: new FutureBuilder(
                 future: getExpenses(),
                 builder: (BuildContext context, AsyncSnapshot<List<Expense>> snapshot) {
-                  if (snapshot.data == null || snapshot.data.isEmpty || !snapshot.hasData)
-                    return new Center(
-                      child: new Text(
-                        "No expenses yet!", 
-                        style: TextStyle(
-                          fontSize: 25, 
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.primaryVariant
-                        ),
-                      ),
+                  if (snapshot.data == null || snapshot.data.isEmpty || !snapshot.hasData) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: _children
+                      )
                     );
-                  List<Expense> expensesList = snapshot.data;
-                  return new ListView.separated(
-                    itemCount: expensesList.length,
-                    separatorBuilder: (BuildContext context, int index) => const Divider(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Card(
-                        color: Colors.amber[400],
-                        child: ListTile(
-                          leading: const Icon(Icons.monetization_on, size: 56),
-                          title: Text('Category: ${expensesList[index].category}'),
-                          subtitle: Text('Total: \$${categoriesSum[index]}')
-                        )
-                      );
-                    }
-                  );
+                  } else {
+                    List<Expense> expensesList = snapshot.data;
+                    return new ListView.separated(
+                      itemCount: expensesList.length,
+                      separatorBuilder: (BuildContext context, int index) => const Divider(),
+                      itemBuilder: (BuildContext context, int index) {
+                        var category = expensesList[index].category;
+                        var amount = expensesList[index].amount.toStringAsFixed(2);
+                        return Card(
+                          color: Colors.amber[400],
+                          child: ListTile(
+                            leading: const Icon(Icons.monetization_on, size: 48),
+                            title: Text('Category: $category', style: TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Text('Total: \$$amount'),
+                            trailing: const Icon(Icons.arrow_right, size: 48),
+                            // onTap: move to summary tab
+                          )
+                        );
+                      }
+                    );
+                  }
                 }
               )
             ),

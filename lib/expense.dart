@@ -15,7 +15,7 @@ class Expense {
       'location': location,
       'category': category,
       'amount': amount,
-      'dateTime': dateTime,
+      'datetime': dateTime,
     };
   }
 }

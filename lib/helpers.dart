@@ -15,4 +15,10 @@ class Helpers {
     );
     return database;
   }
+
+  static clearDb() async {
+    final Database db = await getDatabase();
+    db.delete('expenses');
+    print('Database cleared');
+  }
 }
