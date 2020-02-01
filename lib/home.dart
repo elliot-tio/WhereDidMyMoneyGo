@@ -27,21 +27,39 @@ class _HomeState extends State<Home> {
     ),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+      final pageController = new PageController(
+        initialPage: _selectedIndex,
+        keepPage: true
+      );
+
+      void _pageChange(int index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      }
+
+      void _onItemTapped(int index) {
+        setState(() {
+          _selectedIndex = index;
+          pageController.animateToPage(index, duration: Duration(milliseconds: 200), curve: Curves.ease);
+        });
+      }
+
+      final pageView = new PageView(
+        controller: pageController,
+        onPageChanged: (index) {
+          _pageChange(index);
+        },
+        children: _widgetOptions
+      );
+      
     return Scaffold(
       appBar: AppBar(
         title: const Text('Where Did My Money Go?'),
       ),
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
-      ),
+      body: pageView,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

@@ -5,9 +5,11 @@ class Summary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RaisedButton(
-      child: Text('Clear DB'),
-      onPressed: () => Helpers.clearDb(),
+    return Center(
+      child: RaisedButton(
+        child: Text('Clear DB'),
+        onPressed: () => Helpers.clearDb(),
+      )
     );
   }
 }
