@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'add_expense_form.dart';
 import 'overview.dart';
 import 'summary.dart';
+import 'helpers.dart';
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -22,7 +23,7 @@ class _HomeState extends State<Home> {
       child: Summary(),
     ),
     Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(16),
       child: AddExpenseForm(),
     ),
   ];
@@ -58,6 +59,10 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Where Did My Money Go?'),
+        leading: RaisedButton(
+          child: Text('Clear DB'),
+          onPressed: () => Helpers.clearDb(),
+        ),
       ),
       body: pageView,
       bottomNavigationBar: BottomNavigationBar(

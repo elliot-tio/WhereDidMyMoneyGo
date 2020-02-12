@@ -13,7 +13,7 @@ class WhereDidMyMoneyGo extends StatelessWidget {
       title: _title,
       theme: ThemeData(
         primarySwatch: Colors.green,
-        primaryColor: Colors.green[300],
+        primaryColor: Colors.green[400],
         accentColor: Colors.cyan[200],
         fontFamily: 'Roboto',
         textTheme: TextTheme(
