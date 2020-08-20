@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'helpers.dart';
-
+import 'summary_popup.dart';
 class Summary extends StatelessWidget {
 
   @override
@@ -55,6 +54,7 @@ class GridIconItem extends StatelessWidget {
 
   final IconBox iconBox;
 
+
   void showPhoto(BuildContext context) {
     Navigator.push(context, MaterialPageRoute<void>(
       builder: (BuildContext context) {
@@ -65,7 +65,7 @@ class GridIconItem extends StatelessWidget {
           body: SizedBox.expand(
             child: Hero(
               tag: iconBox.tag,
-              child: Text('Heh?'),
+              child: SummaryPopup(),
             ),
           ),
         );
@@ -108,44 +108,54 @@ class SummaryGridState extends State<SummaryGrid> {
 
   List<IconBox> _icons = <IconBox>[
     IconBox(
-      assetName: 'food.png',
+      assetName: 'money-icons.png',
       title: 'Bills',
       caption: 'Housing, Utility, Phone',
     ),
     IconBox(
-      assetName: 'places/india_tanjore_bronze_works.png',
+      assetName: 'debt.jpg',
       title: 'Debt',
       caption: 'Debt/Loan Repayment',
     ),
     IconBox(
-      assetName: 'places/india_tanjore_market_merchant.png',
+      assetName: 'entertainment.png',
       title: 'Entertainment',
       caption: 'Fun Things',
     ),
     IconBox(
-      assetName: 'places/india_tanjore_thanjavur_temple.png',
+      assetName: 'food.png',
       title: 'Food',
       caption: 'Dining Out',
     ),
     IconBox(
-      assetName: 'places/india_tanjore_thanjavur_temple_carvings.png',
+      assetName: 'gasoline.png',
       title: 'Gas',
       caption: 'For the Car',
     ),
     IconBox(
-      assetName: 'places/india_pondicherry_salt_farm.png',
+      assetName: 'groceries.png',
       title: 'Groceries',
       caption: 'Food for the Week',
     ),
     IconBox(
-      assetName: 'places/india_chennai_highway.png',
+      assetName: 'investments.png',
       title: 'Investment',
       caption: 'Save, Save, Save',
     ),
     IconBox(
-      assetName: 'places/india_chettinad_silk_maker.png',
+      assetName: 'pets.png',
       title: 'Pets',
-      caption: 'Pet Stuffs',
+      caption: 'Pets',
+    ),
+    IconBox(
+      assetName: 'home.png',
+      title: 'Rent/Mortgage',
+      caption: 'Rent/Mortgage Expenses'
+    ),
+    IconBox(
+      assetName: 'other.png',
+      title: 'Other',
+      caption: 'Miscellaneous'
     ),
   ];
 

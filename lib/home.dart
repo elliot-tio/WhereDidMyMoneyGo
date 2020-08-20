@@ -69,15 +69,15 @@ class _HomeState extends State<Home> {
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
             icon: Icon(Icons.pie_chart_outlined),
-            title: Text('Overview'),
+            label: 'Overview',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.assessment),
-            title: Text('Summary'),
+            label: 'Summary',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.attach_money),
-            title: Text('Add Expense'),
+            label: 'Add Expense',
           ),
         ],
         currentIndex: _selectedIndex,

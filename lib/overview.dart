@@ -71,7 +71,6 @@ class _OverviewState extends State<Overview> {
       columns: [
         "SUM(amount) AS sum",
         "category",
-        "dateTime",
       ], 
       groupBy: "category");
 
@@ -79,7 +78,6 @@ class _OverviewState extends State<Overview> {
       return Expense(
         category: maps[i]['category'],
         amount: maps[i]['sum'],
-        dateTime: maps[i]['datetime']
       );
     });
   }

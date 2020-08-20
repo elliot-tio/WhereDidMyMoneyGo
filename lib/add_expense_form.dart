@@ -60,6 +60,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
     'Groceries',
     'Investment',
     'Pets',
+    'Rent/Mortgage Payment',
     'Other'
   ];
 
@@ -101,6 +102,28 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
+                        Text('Categories'),
+                        DropdownButton(
+                          items: _dropdownValues.map((String value) {
+                            return new DropdownMenuItem<String>(
+                              value: value,
+                              child: new Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCategory = value;
+                            });
+                          },
+                          hint: new Text('Select a Category'),
+                          isExpanded: true,
+                          value: _selectedCategory,
+                        ),
+                      ]
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
                         Text('Description'),
                         TextFormField(
                           focusNode: focusOnError,
@@ -134,28 +157,6 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
                           },
                         ),
                       ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Text('Categories'),
-                        DropdownButton(
-                          items: _dropdownValues.map((String value) {
-                            return new DropdownMenuItem<String>(
-                              value: value,
-                              child: new Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedCategory = value;
-                            });
-                          },
-                          hint: new Text('Select a Category'),
-                          isExpanded: true,
-                          value: _selectedCategory,
-                        ),
-                      ]
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
