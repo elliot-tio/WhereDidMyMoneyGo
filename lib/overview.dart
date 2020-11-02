@@ -126,7 +126,7 @@ class _OverviewState extends State<Overview> {
           ),
         );
       }
-    ));
+    )).then((_) => setState((){}));
   }
 
   @override
