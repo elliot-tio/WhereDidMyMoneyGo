@@ -3,6 +3,7 @@ import 'add_expense_form.dart';
 import 'overview.dart';
 import 'summary.dart';
 import 'helpers.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 class Home extends StatefulWidget {
   Home({Key key}) : super(key: key);
@@ -57,13 +58,14 @@ class _HomeState extends State<Home> {
       );
       
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Where Did My Money Go?'),
-        leading: RaisedButton(
-          child: Text('Clear DB'),
-          onPressed: () => Helpers.clearDb(),
-        ),
-      ),
+      appBar: Foundation.kDebugMode ?
+          AppBar(
+            title: const Text('Where Did My Money Go?'),
+            leading: RaisedButton(
+              child: Text('Clear DB'),
+              onPressed: () => Helpers.clearDb(),
+            ),
+          ) : AppBar(title: const Text('Where Did My Money Go?')),
       body: pageView,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

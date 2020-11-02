@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'expense.dart';
 import 'helpers.dart';
+import 'summary_popup.dart';
 
 class Overview extends StatefulWidget {
   @override
@@ -110,6 +111,24 @@ class _OverviewState extends State<Overview> {
     super.dispose();
   }
 
+  void showPhoto(BuildContext context, category) {
+    Navigator.push(context, MaterialPageRoute<void>(
+      builder: (BuildContext context) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(category),
+          ),
+          body: SizedBox.expand(
+            child: Hero(
+              tag: category,
+              child: SummaryPopup(category: category),
+            ),
+          ),
+        );
+      }
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -209,7 +228,7 @@ class _OverviewState extends State<Overview> {
                             title: Text('Category: $category', style: TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Text('Total: \$$amount'),
                             trailing: const Icon(Icons.arrow_right, size: 48),
-                            // onTap: move to summary tab
+                            onTap: () { showPhoto(context, category); },
                           )
                         );
                       }

@@ -54,7 +54,6 @@ class GridIconItem extends StatelessWidget {
 
   final IconBox iconBox;
 
-
   void showPhoto(BuildContext context) {
     Navigator.push(context, MaterialPageRoute<void>(
       builder: (BuildContext context) {

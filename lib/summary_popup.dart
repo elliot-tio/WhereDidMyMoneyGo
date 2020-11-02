@@ -122,7 +122,7 @@ class _SummaryPopupState extends State<SummaryPopup> {
                       } else {
                         var total = expensesList.map<double>((ex) => ex.amount).reduce((a, b) => a + b);
                         return ListTile(
-                          title: Text('Total:'),
+                          title: Text('Total:', style: TextStyle(fontWeight: FontWeight.bold)),
                           trailing: Text('\$$total')
                         );
                       }
