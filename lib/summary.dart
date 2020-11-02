@@ -65,7 +65,7 @@ class GridIconItem extends StatelessWidget {
           body: SizedBox.expand(
             child: Hero(
               tag: iconBox.tag,
-              child: SummaryPopup(),
+              child: SummaryPopup(category: iconBox.title),
             ),
           ),
         );

@@ -1,11 +1,14 @@
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter/material.dart';
 import 'expense.dart';
 import 'helpers.dart';
 import 'dart:async';
-import 'monthly_expenses_chart.dart';
+//import 'monthly_expenses_chart.dart';
 
 class SummaryPopup extends StatefulWidget {
+  final String category;
+  SummaryPopup({Key key, @required this.category}) : super(key: key);
   @override
   State<StatefulWidget> createState() => _SummaryPopupState();
 }
@@ -43,29 +46,33 @@ class _SummaryPopupState extends State<SummaryPopup> {
     super.initState();
   }
 
-  Future<List<Expense>> expenses() async {
+  Future<List<Expense>> expenses(category) async {
     final Database db = await Helpers.getDatabase();
 
     final List<Map<String, dynamic>> maps = await db.query(
       'expenses', 
       columns: [
-        "SUM(amount) AS sum",
-        "category",
+        "amount",
         "dateTime",
+        "location",
+        "description",
+        
       ], 
-      groupBy: "category");
+      where: "category = ?",
+      whereArgs: [category]);
 
     return List.generate(maps.length, (i) {
       return Expense(
-        category: maps[i]['category'],
-        amount: maps[i]['sum'],
-        dateTime: maps[i]['datetime']
+        amount: maps[i]['amount'],
+        dateTime: maps[i]['datetime'],
+        location: maps[i]['location'],
+        description: maps[i]['description']
       );
     });
   }
 
-  Future<List<Expense>> getExpenses() async {
-    return await expenses();
+  Future<List<Expense>> getExpenses(category) async {
+    return await expenses(category);
   }
 
   @override
@@ -81,12 +88,12 @@ class _SummaryPopupState extends State<SummaryPopup> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Expanded(
-            child: MonthlyExpenses(),
-          ),
+          //Expanded(
+          //  child: MonthlyExpenses(),
+          //),
           Expanded(
             child: new FutureBuilder(
-              future: getExpenses(),
+              future: getExpenses(widget.category),
               builder: (BuildContext context, AsyncSnapshot<List<Expense>> snapshot) {
                 if (snapshot.data == null || snapshot.data.isEmpty || !snapshot.hasData) {
                   return Center(
@@ -99,21 +106,26 @@ class _SummaryPopupState extends State<SummaryPopup> {
                 } else {
                   List<Expense> expensesList = snapshot.data;
                   return new ListView.separated(
-                    itemCount: expensesList.length,
+                    itemCount: expensesList.length + 1,
                     separatorBuilder: (BuildContext context, int index) => const Divider(),
                     itemBuilder: (BuildContext context, int index) {
-                      var category = expensesList[index].category;
-                      var amount = expensesList[index].amount.toStringAsFixed(2);
-                      return Card(
-                        color: Colors.amber[400],
-                        child: ListTile(
-                          leading: const Icon(Icons.monetization_on, size: 48),
-                          title: Text('Category: $category', style: TextStyle(fontWeight: FontWeight.bold)),
-                          subtitle: Text('Total: \$$amount'),
-                          trailing: const Icon(Icons.arrow_right, size: 48),
-                          // onTap: move to summary tab
-                        )
-                      );
+                      if(index < expensesList.length) {
+                        var datetime = DateFormat.yMMMEd().add_jms().format(new DateTime.fromMillisecondsSinceEpoch(expensesList[index].dateTime));
+                        var location = expensesList[index].location;
+                        var desc = expensesList[index].description;
+                        var amount = expensesList[index].amount.toStringAsFixed(2);
+                        return ListTile(
+                          title: Text('$desc', style: TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Text('Location: $location\n$datetime'),
+                          trailing: Text('\$$amount'),
+                        );
+                      } else {
+                        var total = expensesList.map<double>((ex) => ex.amount).reduce((a, b) => a + b);
+                        return ListTile(
+                          title: Text('Total:'),
+                          trailing: Text('\$$total')
+                        );
+                      }
                     }
                   );
                 }
