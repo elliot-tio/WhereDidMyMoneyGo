@@ -58,7 +58,9 @@ class _HomeState extends State<Home> {
       );
       
     return Scaffold(
-      appBar: Foundation.kDebugMode ?
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(40.0),
+        child: Foundation.kDebugMode ?
           AppBar(
             title: const Text('Where Did My Money Go?'),
             leading: RaisedButton(
@@ -66,6 +68,7 @@ class _HomeState extends State<Home> {
               onPressed: () => Helpers.clearDb(),
             ),
           ) : AppBar(title: const Text('Where Did My Money Go?')),
+      ),
       body: pageView,
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

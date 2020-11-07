@@ -46,6 +46,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
     // Clean up the controller when the widget is disposed.
     moneyController.dispose();
     descriptionController.dispose();
+    locationController.dispose();
     focusOnError.dispose();
     super.dispose();
   }
@@ -212,7 +213,7 @@ class _AddExpenseFormState extends State<AddExpenseForm> {
                                   amount: moneyController.numberValue,
                                   dateTime: _dateTime.millisecondsSinceEpoch,
                                 ));
-                                Scaffold.of(context).showSnackBar(SnackBar(content: Text('Success! Expense Saved!'), backgroundColor: Colors.lightGreen[300],));
+                                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Success! Expense Saved!'), backgroundColor: Colors.lightGreen[300],));
                                 _formKey.currentState.reset();
                               } else {
                                 FocusScope.of(context).requestFocus(focusOnError);

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'expense.dart';
 import 'helpers.dart';
 import 'dart:async';
+import 'package:flutter_masked_text/flutter_masked_text.dart';
 //import 'monthly_expenses_chart.dart';
 
 class SummaryPopup extends StatefulWidget {
@@ -27,6 +28,8 @@ class _SummaryPopupState extends State<SummaryPopup> {
   ];
   Timer _timer;
 
+  FocusNode focusOnError;
+
   @override
   void initState() {
     _timer = Timer(new Duration(seconds: 1), () {
@@ -44,8 +47,11 @@ class _SummaryPopupState extends State<SummaryPopup> {
       });
     });
     super.initState();
+
+    focusOnError = FocusNode();
   }
 
+  // TODO:: make order selectable by user, or add a filter function
   Future<List<Expense>> expenses(String category) async {
     final Database db = await Helpers.getDatabase();
 
@@ -57,10 +63,11 @@ class _SummaryPopupState extends State<SummaryPopup> {
         "dateTime",
         "location",
         "description",
-        
+        "category"
       ], 
       where: "category = ?",
-      whereArgs: [category]);
+      whereArgs: [category],
+      orderBy: "dateTime");
 
     return List.generate(maps.length, (i) {
       return Expense(
@@ -68,7 +75,8 @@ class _SummaryPopupState extends State<SummaryPopup> {
         amount: maps[i]['amount'],
         dateTime: maps[i]['datetime'],
         location: maps[i]['location'],
-        description: maps[i]['description']
+        description: maps[i]['description'],
+        category: maps[i]['category']
       );
     });
   }
@@ -91,6 +99,7 @@ class _SummaryPopupState extends State<SummaryPopup> {
   void dispose() {
     _timer.cancel();
     _timer = null;
+    focusOnError.dispose();
     super.dispose();
   }
 
@@ -101,7 +110,7 @@ class _SummaryPopupState extends State<SummaryPopup> {
       context: context,
       builder: (BuildContext context) => 
         AlertDialog(
-          title: Text('Delete expense',
+          title: Text('Delete ' + expense.description,
             style: TextStyle(
                 fontSize: 25, 
                 fontWeight: FontWeight.bold,
@@ -133,11 +142,44 @@ class _SummaryPopupState extends State<SummaryPopup> {
     );
   }
 
-  void showPopup(context, expense) {
+  Future<void> updateExpense(Expense expense) async {
+    // Get a reference to the database.
+    final Database db = await Helpers.getDatabase();
+
+// TODO:: read up on how to do update
+    await db.update(
+      'expenses',
+      expense.toMap(),
+      where: "id = ?",
+      whereArgs: [expense.id]
+    );
+  }
+
+  void showPopup(parentContext, expense) {
+    final _formKey = GlobalKey<FormState>();
+    // TODO:: add values to db
+    final _dropdownValues = <String>[
+      'Bills', 
+      'Debt', 
+      'Entertainment', 
+      'Food', 
+      'Gas', 
+      'Groceries',
+      'Investment',
+      'Pets',
+      'Rent/Mortgage Payment',
+      'Other'
+    ];
+    var _selectedCategory = expense.category;
+    DateTime _dateTime = DateTime.fromMillisecondsSinceEpoch(expense.dateTime);
+    final moneyController = new MoneyMaskedTextController(initialValue: expense.amount, decimalSeparator: '.', thousandSeparator: ',', leftSymbol: '\$', rightSymbol: ' CAD');
+    final descriptionController = TextEditingController(text: expense.description);
+    final locationController = TextEditingController(text: expense.location);
+
     showDialog(
-      context: context, 
+      context: parentContext, 
       builder: (BuildContext context) => AlertDialog(
-        title: Text('Edit expense',
+        title: Text('Edit ' + expense.description,
           style: TextStyle(
               fontSize: 25, 
               fontWeight: FontWeight.bold,
@@ -145,12 +187,112 @@ class _SummaryPopupState extends State<SummaryPopup> {
           )
         ),
         content: SingleChildScrollView(
-          child: ListBody(
-            children: <Widget>[
-              Text('This is a demo alert dialog.'),
-              Text('Would you like to approve of this message?')
-            ]
-          )
+          child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Categories'),
+                        DropdownButton(
+                          items: _dropdownValues.map((String value) {
+                            return new DropdownMenuItem<String>(
+                              value: value,
+                              child: new Text(value),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            setState(() {
+                              _selectedCategory = value;
+                            });
+                          },
+                          hint: new Text('Select a Category'),
+                          isExpanded: true,
+                          value: _selectedCategory,
+                        ),
+                      ]
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Description'),
+                        TextFormField(
+                          focusNode: focusOnError,
+                          controller: descriptionController,
+                          decoration: const InputDecoration(
+                            hintText: 'Enter a Description',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a description';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Location'),
+                        TextFormField(
+                          controller: locationController,
+                          decoration: const InputDecoration(
+                            hintText: 'Enter a Location',
+                          ),
+                          validator: (value) {
+                            if (value.isEmpty) {
+                              return 'Please enter a location';
+                            }
+                            return null;
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Amount'),
+                        TextFormField(
+                          controller: moneyController,
+                          keyboardType: TextInputType.number,
+                          validator: (_) {
+                            if(moneyController.numberValue == 0) {
+                              return 'Please enter an amount';
+                            }
+                            return null;
+                          },
+                          textAlign: TextAlign.end,
+                        )
+                      ],
+                    ),
+                    SizedBox(height: 10),
+                    RaisedButton(
+                      child: Text(DateFormat.yMMMEd().format(_dateTime)),
+                      onPressed: () {
+                        showDatePicker(
+                          context: context,
+                          initialDate: _dateTime,
+                          firstDate: DateTime(2019),
+                          lastDate: DateTime(2100),
+                        ).then((date) {
+                          setState(() {
+                            _dateTime = date == null ? DateTime.now() : date;
+                          });
+                        });
+                      },
+                      color: Theme.of(context).colorScheme.primary,
+                      textColor: Colors.white,
+                    )
+                  ],
+                ),
+              )
         ),
         actions: <Widget>[
           TextButton(
@@ -160,9 +302,26 @@ class _SummaryPopupState extends State<SummaryPopup> {
             },
           ),
           TextButton(
-            child: Text('Approve'),
-            onPressed: () {
-              Navigator.of(context).pop();
+            child: Text('Update'),
+            onPressed: () async {
+              // Validate will return true if the form is valid, or false if
+              // the form is invalid.
+              if (_formKey.currentState.validate()) {
+                // Process data.
+                await updateExpense(Expense(
+                  id: expense.id,
+                  description: descriptionController.text,
+                  location: locationController.text,
+                  category: _selectedCategory,
+                  amount: moneyController.numberValue,
+                  dateTime: _dateTime.millisecondsSinceEpoch,
+                ));
+                setState(() {});
+                ScaffoldMessenger.of(parentContext).showSnackBar(SnackBar(content: Text('Success! Expense Updated!'), backgroundColor: Colors.lightGreen[300],));
+                Navigator.of(context).pop();
+              } else {
+                FocusScope.of(context).requestFocus(focusOnError);
+              }
             },
           ),
         ],
@@ -198,7 +357,7 @@ class _SummaryPopupState extends State<SummaryPopup> {
                     separatorBuilder: (BuildContext context, int index) => const Divider(),
                     itemBuilder: (BuildContext context, int index) {
                       if(index < expensesList.length) {
-                        var datetime = DateFormat.yMMMEd().add_jms().format(new DateTime.fromMillisecondsSinceEpoch(expensesList[index].dateTime));
+                        var datetime = DateFormat.yMMMEd().format(new DateTime.fromMillisecondsSinceEpoch(expensesList[index].dateTime));
                         var location = expensesList[index].location;
                         var desc = expensesList[index].description;
                         var amount = expensesList[index].amount.toStringAsFixed(2);
