@@ -62,12 +62,12 @@ class _HomeState extends State<Home> {
         preferredSize: Size.fromHeight(40.0),
         child: Foundation.kDebugMode ?
           AppBar(
-            title: const Text('Where Did My Money Go?'),
+            title: const Text('Where Did My Money Go'),
             leading: RaisedButton(
               child: Text('Clear DB'),
               onPressed: () => Helpers.clearDb(),
             ),
-          ) : AppBar(title: const Text('Where Did My Money Go?')),
+          ) : AppBar(title: const Text('Where Did My Money Go')),
       ),
       body: pageView,
       bottomNavigationBar: BottomNavigationBar(

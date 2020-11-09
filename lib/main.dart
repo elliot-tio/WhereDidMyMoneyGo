@@ -5,7 +5,7 @@ void main() => runApp(WhereDidMyMoneyGo());
 
 /// This Widget is the main application widget.
 class WhereDidMyMoneyGo extends StatelessWidget {
-  static const String _title = 'Where Did My Money Go?';
+  static const String _title = 'Where Did My Money Go';
 
   @override
   Widget build(BuildContext context) {
