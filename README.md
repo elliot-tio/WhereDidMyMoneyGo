@@ -1,7 +1,10 @@
 # Where Did My Money Go?
 
-A new Flutter project.
-
 ## Money Management
 
-Android app for managing and tracking your funds and expenses for responsible personal finances.
+This is an android app for managing and tracking your expenses. Hopefully it will help us be more fiscally responsible!
+
+## Future Ideas
+* Monthly Breakdown
+* Receipt image storage
+* Using firebase database instead of local sqlite
