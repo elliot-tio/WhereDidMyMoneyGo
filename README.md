@@ -9,6 +9,7 @@ This is an android app for managing and tracking your expenses. Hopefully it wil
 * Receipt image storage
 * Using firebase database instead of local sqlite
 * More categories: education, shopping, gifts
+  * Personalized categories
 * Location not required
 * Foreign currencies
 * Capitalize input fields
