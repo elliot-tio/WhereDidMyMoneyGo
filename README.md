@@ -11,3 +11,4 @@ This is an android app for managing and tracking your expenses. Hopefully it wil
 * More categories: education, shopping, gifts
 * Location not required
 * Foreign currencies
+* Capitalize input fields
