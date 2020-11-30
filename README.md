@@ -13,3 +13,4 @@ This is an android app for managing and tracking your expenses. Hopefully it wil
 * Location not required
 * Foreign currencies
 * Capitalize input fields
+* Recurring payments
