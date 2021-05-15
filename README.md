@@ -14,3 +14,4 @@ This is an android app for managing and tracking your expenses. Hopefully it wil
 * Foreign currencies
 * Capitalize input fields
 * Recurring payments
+* Joint budgeting (cloud?)
